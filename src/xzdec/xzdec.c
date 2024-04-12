@@ -257,9 +257,21 @@ uncompress(lzma_stream *strm, FILE *file, const char *filename)
 							!= 0
 						|| !feof(file))
 					ret = LZMA_DATA_ERROR;
-				else
+				else {
+					// TODO: check this reasoning is right
+					// Avoid a dangling reference in strm for
+					// safety, although there's no reason for
+					// anyone to try read on this again with
+					// LZMA_STREAM_END.
+					strm->next_out = NULL;
 					return;
+				}
 #else
+				// Avoid a dangling reference in strm for
+				// safety, although there's no reason for
+				// anyone to try read on this again with
+				// LZMA_FINISH.
+				strm->next_out = NULL;
 				// lzma_stream_decoder() already guarantees
 				// that there's no trailing garbage.
 				assert(strm->avail_in == 0);
