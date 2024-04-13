@@ -1,0 +1,24 @@
+name: Coverity Scan
+
+# We only want to test a special branch, per https://docs.travis-ci.com/user/coverity-scan/#build-submission-frequency
+on:
+  branches: [coverity_scan]
+
+jobs:
+  coverity:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -qy autoconf automake build-essential po4a autopoint gcc-multilib doxygen
+    - name: Run autoreconf
+      run: |
+        ./autogen.sh
+    - run: ./configure --disable-silent-rules
+    - uses: vapier/coverity-scan-action@2068473c7bdf8c2fb984a6a40ae76ee7facd7a85 # v1.8.0
+      with:
+        command: make -Oline -j$(getconf _NPROCESSORS_CONF)
+        email: ${{ secrets.COVERITY_SCAN_EMAIL }}
+        token: ${{ secrets.COVERITY_SCAN_TOKEN }}
