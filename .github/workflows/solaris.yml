@@ -27,6 +27,19 @@ jobs:
           export LC_ALL=C LANG=C
           uname -a
           ./autogen.sh --no-po4a
+
+          printf "Dumping system information\n"
+          for cmd in 'freebsd-version' 'cat /etc/release' 'uname -a' 'cc --version' \
+            'gcc --version' 'clang --version' 'ld --version' \
+            'autoconf --version' 'automake --version' 'libtool --version' \
+            'gettext --version' 'm4 --version' \
+            'sed --version' 'awk --version' ; do
+            printf "Running cmd: %s\n" ${cmd}
+            ${cmd} || true
+          done
+          printf "\n\n"
+
+          ./autogen.sh
           ./configure --enable-werror
           make
           make check VERBOSE=1
