@@ -22,6 +22,7 @@ jobs:
         usesh: true
         prepare: |
           pkg install bash libtool automake gnu-m4 tree wget gcc autoconf
+          pkg install --accept developerstudio-125
         run: |
           export LC_ALL=C LANG=C
 
