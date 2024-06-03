@@ -14,17 +14,29 @@ jobs:
     runs-on: ubuntu-latest
     name: Test xz on NetBSD
     steps:
-    - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 #v4
+    - uses: actions/checkout@v4.1.6
     - name: Test in NetBSD
       id: test
       uses: vmactions/NetBSD-vm@da9ed4d7cd0fb64f330e2342ac5c77ba529b6a11 #v1.0.7
       with:
         usesh: true
         prepare: |
-          /usr/sbin/pkg_add -v autoconf automake gmake gettext-tools gtar-base libtool-base m4
+          /usr/sbin/pkg_add -v autoconf automake gmake gettext-tools gtar-base libtool-base m4 po4a
         run: |
+          set -e
           export LC_ALL=C LANG=C
-          uname -a
+
+          printf "Dumping system information\n"
+          for cmd in 'freebsd-version' 'cat /etc/release' 'uname -a' 'cc --version' \
+            'gcc --version' 'clang --version' 'ld --version' \
+            'autoconf --version' 'automake --version' 'libtool --version' \
+            'gettext --version' 'm4 --version' \
+            'sed --version' 'awk --version' ; do
+            printf "Running cmd: %s\n" ${cmd}
+            ${cmd} || true
+          done
+          printf "\n\n"
+
           ./autogen.sh
           ./configure --enable-werror
           make

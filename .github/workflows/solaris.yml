@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: 0BSD
 
-name: OpenBSD
+name: Solaris
 
 on:
   push:
@@ -10,37 +10,32 @@ on:
   workflow_dispatch:
 
 jobs:
-  OpenBSD-test:
+  solaris-test:
     runs-on: ubuntu-latest
-    name: Test xz on OpenBSD
+    name: Test xz on Solaris
     steps:
     - uses: actions/checkout@v4.1.6
-    - name: Test in OpenBSD
+    - name: Test in Solaris
       id: test
-      uses: vmactions/OpenBSD-vm@eaa3d3f695a5a52971c23958f6dd4cd3397f959d #v1.0.8
+      uses: vmactions/solaris-vm@548f790d1bc2b9342a76cbb47ddbb85875605559 #v1.0.2
       with:
         usesh: true
         prepare: |
-          /usr/sbin/pkg_add -I -v autoconf-2.71 automake-1.16.5 gmake gettext-tools gtar libtool m4
+          pkg install bash libtool automake gnu-m4 tree wget gcc autoconf
         run: |
-          set -e
           export LC_ALL=C LANG=C
-          export AUTOCONF_VERSION=2.71
-          export AUTOMAKE_VERSION=1.16
 
           printf "Dumping system information\n"
           for cmd in 'freebsd-version' 'cat /etc/release' 'uname -a' 'cc --version' \
             'gcc --version' 'clang --version' 'ld --version' \
             'autoconf --version' 'automake --version' 'libtool --version' \
-            'gettext --version' 'm4 --version' \
-            'sed --version' 'awk --version' ; do
+            'gettext --version' ; do
             printf "Running cmd: %s\n" ${cmd}
             ${cmd} || true
           done
           printf "\n\n"
 
-          # OpenBSD ports lack po4a
-          ./autogen.sh --no-po4a
+          ./autogen.sh
           ./configure --enable-werror
           make
           make check VERBOSE=1
