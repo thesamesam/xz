@@ -430,7 +430,7 @@ endif()
 
 option(BUILD_SHARED_LIBS "Build liblzma as a shared library instead of static")
 
-# Symbol versioning is supported ELF shared libraries on certain OSes.
+# Symbol versioning is supported with ELF shared libraries on certain OSes.
 # First assume that symbol versioning isn't supported.
 set(SYMBOL_VERSIONING "no")
 
@@ -604,11 +604,11 @@ set_property(CACHE XZ_THREADS
              PROPERTY STRINGS "${SUPPORTED_THREADING_METHODS}")
 
 # This is a flag variable set when win95 threads are used. We must ensure
-# the combination of enable_small and win95 threads is not used without a
-# compiler supporting attribute __constructor__.
+# the combination of enable_small and win95 threads is only used with a
+# compiler supporting the __constructor__ attribute.
 set(USE_WIN95_THREADS OFF)
 
-# This is a flag variable set when posix threads (pthreads) are used.
+# This is a flag variable set when posix threading (pthreads) are used.
 # It's needed when creating liblzma-config.cmake where dependency on
 # Threads::Threads is only needed with pthreads.
 set(USE_POSIX_THREADS OFF)
@@ -624,7 +624,7 @@ if(XZ_THREADS)
     find_package(Threads REQUIRED)
 
     # If both Windows and posix threading are available, prefer Windows.
-    # Note that on Cygwin CMAKE_USE_WIN32_THREADS_INIT is false.
+    # Note that on Cygwin, CMAKE_USE_WIN32_THREADS_INIT is false.
     if(CMAKE_USE_WIN32_THREADS_INIT AND NOT XZ_THREADS STREQUAL "posix")
         if(XZ_THREADS STREQUAL "win95"
                 OR (XZ_THREADS STREQUAL "yes" AND CMAKE_SIZEOF_VOID_P EQUAL 4))
@@ -1233,8 +1233,7 @@ tuklib_add_definition_if(liblzma HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR)
 if(USE_WIN95_THREADS AND XZ_SMALL AND NOT HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR)
     message(SEND_ERROR "Threading method win95 and XZ_SMALL "
                         "cannot be used at the same time with a compiler "
-                        "that doesn't support "
-                        "__attribute__((__constructor__))")
+                        "lacking __attribute__((__constructor__))")
 endif()
 
 
