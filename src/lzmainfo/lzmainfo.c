@@ -109,6 +109,7 @@ parse_args(int argc, char **argv)
 
 
 /// Primitive base-2 logarithm for integers
+lzma_attr_const
 static uint32_t
 my_log2(uint32_t n)
 {
