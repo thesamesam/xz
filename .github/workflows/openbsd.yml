@@ -27,7 +27,18 @@ jobs:
           export LC_ALL=C LANG=C
           export AUTOCONF_VERSION=2.71
           export AUTOMAKE_VERSION=1.16
-          uname -a
+
+          printf "Dumping system information\n"
+          for cmd in 'freebsd-version' 'cat /etc/release' 'uname -a' 'cc --version' \
+            'gcc --version' 'clang --version' 'ld --version' \
+            'autoconf --version' 'automake --version' 'libtool --version' \
+            'gettext --version' 'm4 --version' \
+            'sed --version' 'awk --version' ; do
+            printf "Running cmd: %s\n" ${cmd}
+            ${cmd} || true
+          done
+          printf "\n\n"
+
           # OpenBSD ports lack po4a
           ./autogen.sh --no-po4a
           ./configure --enable-werror
